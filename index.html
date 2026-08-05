@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eat Token + Auto Login</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 { color: #333; margin-bottom: 5px; }
+        .sub { color: #666; font-size: 14px; margin-bottom: 20px; }
+        .token-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            word-break: break-all;
+            min-height: 60px;
+            border: 2px dashed #dee2e6;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-green { background: #28a745; }
+        .btn-red { background: #dc3545; }
+        .btn-orange { background: #fd7e14; }
+        .status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+        .success { background: #d4edda; color: #155724; display: block; }
+        .error { background: #f8d7da; color: #721c24; display: block; }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: left;
+            font-size: 13px;
+            color: #0d47a1;
+        }
+        .footer {
+            margin-top: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-group .btn {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🎮 Eat Token Pro</h1>
+        <p class="sub">Free Fire Access Token + Auto Login</p>
+        
+        <div class="token-box" id="tokenDisplay">
+            🔑 টোকেন তৈরি করুন
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn" onclick="generateToken()">🔄 নতুন</button>
+            <button class="btn btn-green" onclick="copyToken()">📋 কপি</button>
+        </div>
+        
+        <button class="btn btn-orange" onclick="getAccountData()">
+            📥 লোকালকনফিগ ডাউনলোড
+        </button>
+        
+        <button class="btn btn-red" onclick="openGame()">
+            🎯 গেম ওপেন করুন
+        </button>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="info">
+            <strong>📌 কিভাবে ব্যবহার করবেন:</strong><br>
+            1. "নতুন" বাটনে ক্লিক করে টোকেন তৈরি করুন<br>
+            2. "কপি" করে টোকেন কপি করুন<br>
+            3. "লোকালকনফিগ ডাউনলোড" করুন<br>
+            4. Android/data/.../files/ এ পেস্ট করুন<br>
+            5. গেম ওপেন করুন 🚀
+        </div>
+        
+        <div class="footer">
+            ⚠️ শুধুমাত্র ব্যক্তিগত ব্যবহারের জন্য | v3.0
+        </div>
+    </div>
+
+    <script>
+        // টোকেন জেনারেট
+        function generateToken() {
+            const chars = '0123456789abcdef';
+            let token = '';
+            for (let i = 0; i < 64; i++) {
+                token += chars[Math.floor(Math.random() * 16)];
+            }
+            
+            document.getElementById('tokenDisplay').innerHTML = `🔑 ${token}`;
+            document.getElementById('tokenDisplay').style.borderColor = '#28a745';
+            localStorage.setItem('lastToken', token);
+            showStatus('success', '✅ টোকেন তৈরি হয়েছে!');
+        }
+        
+        // টোকেন কপি
+        function copyToken() {
+            const tokenText = document.getElementById('tokenDisplay').textContent;
+            const token = tokenText.replace('🔑', '').trim();
+            
+            if (token.includes('তৈরি') || token.includes('কপি')) {
+                showStatus('error', '❌ আগে টোকেন তৈরি করুন!');
+                return;
+            }
+            
+            navigator.clipboard.writeText(token).then(() => {
+                showStatus('success', '✅ কপি হয়েছে!');
+            });
+        }
+        
+        // অ্যাকাউন্ট ডেটা আনুন + লোকালকনফিগ ডাউনলোড
+        async function getAccountData() {
+            const tokenText = document.getElementById('tokenDisplay').textContent;
+            const token = tokenText.replace('🔑', '').trim();
+            
+            if (token.includes('তৈরি')) {
+                showStatus('error', '❌ আগে টোকেন তৈরি করুন!');
+                return;
+            }
+            
+            showStatus('success', '⏳ ডেটা আনা হচ্ছে...');
+            
+            try {
+                const response = await fetch(`https://login.KillerSharmaBot.online/login?access_token=${token}`);
+                const data = await response.json();
+                
+                if (!data.localconfig) {
+                    throw new Error('localconfig পাওয়া যায়নি');
+                }
+                
+                // লোকালকনফিগ ডাউনলোড
+                const localconfig = data.localconfig;
+                const blob = new Blob([JSON.stringify(localconfig, null, 2)], 
+                    {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'localconfig.json';
+                a.click();
+                
+                // অ্যাকাউন্ট ইনফো
+                showStatus('success', 
+                    `✅ সফল!\nনাম: ${data.nickname || 'N/A'}\nID: ${data.account_id || 'N/A'}\nলেভেল: ${data.level || 'N/A'}`
+                );
+                
+                // অটো সেভ
+                localStorage.setItem('lastAccount', JSON.stringify({
+                    name: data.nickname,
+                    id: data.account_id,
+                    level: data.level
+                }));
+                
+            } catch(error) {
+                showStatus('error', '❌ ' + error.message);
+            }
+        }
+        
+        // গেম ওপেন
+        function openGame() {
+            const tokenText = document.getElementById('tokenDisplay').textContent;
+            const token = tokenText.replace('🔑', '').trim();
+            
+            if (token.includes('তৈরি')) {
+                showStatus('error', '❌ আগে টোকেন তৈরি করুন!');
+                return;
+            }
+            
+            window.open(`https://login.KillerSharmaBot.online/login?access_token=${token}`, '_blank');
+            showStatus('success', '🚀 গেম লগইন পেজ খোলা হয়েছে!');
+        }
+        
+        // স্ট্যাটাস শো
+        function showStatus(type, message) {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.innerHTML = message.replace(/\n/g, '<br>');
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    status.className = 'status';
+                    status.innerHTML = '';
+                }, 5000);
+            }
+        }
+        
+        // পেজ লোড
+        window.onload = function() {
+            const lastToken = localStorage.getItem('lastToken');
+            if (lastToken) {
+                document.getElementById('tokenDisplay').innerHTML = `🔑 ${lastToken}`;
+                document.getElementById('tokenDisplay').style.borderColor = '#28a745';
+            }
+        };
+    </script>
+</body>
+</html>
