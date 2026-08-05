@@ -3,39 +3,289 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔥 Eat Token - by তোমার নাম</title>
-  <link rel="stylesheet" href="style.css">
+  <title>🔥 FF Token to JWT - Developed by Tuhin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: white;
+      font-family: 'Arial', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: #1a1a1a;
+      border-radius: 15px;
+      padding: 40px 30px;
+      max-width: 550px;
+      width: 100%;
+      box-shadow: 0 0 30px rgba(255, 69, 0, 0.4);
+      text-align: center;
+    }
+
+    h1 {
+      color: #ff4500;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      background: #0d0d0d;
+      border: 2px solid #333;
+      border-radius: 10px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    input:focus {
+      border-color: #ff4500;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 15px;
+      background: #ff4500;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #ff5722;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255, 69, 0, 0.4);
+    }
+
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .result-box {
+      background: #111;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 25px;
+      display: none;
+      text-align: left;
+    }
+
+    .result-box.show {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #222;
+      font-size: 14px;
+      word-break: break-all;
+    }
+
+    .info-item:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: #ff8c42;
+      font-weight: bold;
+      min-width: 120px;
+    }
+
+    .value {
+      color: #ddd;
+      text-align: right;
+    }
+
+    .token-text {
+      font-size: 11px;
+      color: #888;
+      max-height: 60px;
+      overflow-y: auto;
+    }
+
+    .error-msg {
+      color: #ff4444;
+      margin-top: 15px;
+      display: none;
+      padding: 15px;
+      background: #1a0000;
+      border-radius: 8px;
+      border: 1px solid #ff4444;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    .loading {
+      color: #ff4500;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #555;
+      line-height: 1.8;
+    }
+
+    footer .credit {
+      color: #ff4500;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>🔥 FF ACCESS TOKEN TO JWT 🔥</h1>
-    <p>Enter your Free Fire access token to get account info & JWT</p>
+    <p class="subtitle">Enter your Free Fire access token to get account information</p>
 
-    <form id="tokenForm">
-      <input type="text" id="accessToken" placeholder="Paste Access Token..." required>
-      <button type="submit">Get Info</button>
-    </form>
+    <input type="text" id="tokenInput" placeholder="Paste your Access Token here..." autocomplete="off">
+    <button id="submitBtn" onclick="getTokenInfo()">Get Information</button>
 
-    <!-- ফলাফল দেখানোর জায়গা -->
-    <div id="result" class="hidden">
-      <h2>✅ Account Details</h2>
-      <div class="info-row"><span>Account Name:</span> <span id="accName">-</span></div>
-      <div class="info-row"><span>Account ID:</span> <span id="accId">-</span></div>
-      <div class="info-row"><span>Open ID:</span> <span id="openId">-</span></div>
-      <div class="info-row"><span>Platform:</span> <span id="platform">-</span></div>
-      <div class="info-row"><span>Region:</span> <span id="region">-</span></div>
-      <div class="info-row"><span>JWT Token:</span> <span id="jwtToken" class="token">-</span></div>
+    <div class="loading" id="loading">⏳ Processing your token...</div>
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="result-box" id="resultBox">
+      <div class="info-item">
+        <span class="label">Account Name:</span>
+        <span class="value" id="accName">-</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Account ID:</span>
+        <span class="value" id="accId">-</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Open ID:</span>
+        <span class="value" id="openId">-</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Platform:</span>
+        <span class="value" id="platform">-</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Region:</span>
+        <span class="value" id="region">-</span>
+      </div>
+      <div class="info-item">
+        <span class="label">JWT Token:</span>
+        <span class="value token-text" id="jwtToken">-</span>
+      </div>
     </div>
 
-    <div id="error" class="hidden error">❌ Something went wrong. Check your token.</div>
-
     <footer>
-      <p>CREDIT ➡️ @narutocodexff ✅</p>
-      <p>JOIN ➡️ @narutocodexofc ✅</p>
-      <p>Made by <strong>তোমার নাম</strong></p>
+      <p>CREDIT ➡️ <span class="credit">@narutocodexff</span> ✅</p>
+      <p>JOIN ➡️ <span class="credit">@narutocodexofc</span> ✅</p>
+      <p>Developed by <span class="credit">Tuhin</span></p>
     </footer>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    async function getTokenInfo() {
+      const token = document.getElementById('tokenInput').value.trim();
+      const resultBox = document.getElementById('resultBox');
+      const errorMsg = document.getElementById('errorMsg');
+      const loading = document.getElementById('loading');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // আগের সবকিছু হাইড করো
+      resultBox.classList.remove('show');
+      errorMsg.classList.remove('show');
+      errorMsg.textContent = '';
+
+      // টোকেন চেক
+      if (!token) {
+        errorMsg.textContent = '❌ Please enter your Access Token!';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      // বাটন ডিজেবল ও লোডিং দেখাও
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing...';
+      loading.classList.add('show');
+
+      try {
+        // API কল
+        const apiUrl = `https://naruto-acess-jwt.vercel.app/access-jwt?access_token=${encodeURIComponent(token)}`;
+        
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Server responded with ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          // ডাটা সেট করো
+          document.getElementById('accName').textContent = data.account_name || 'N/A';
+          document.getElementById('accId').textContent = data.account_id || 'N/A';
+          document.getElementById('openId').textContent = data.open_id || 'N/A';
+          document.getElementById('platform').textContent = data.login_platform || data.platform || 'N/A';
+          document.getElementById('region').textContent = data.region || 'N/A';
+          document.getElementById('jwtToken').textContent = data.token || 'N/A';
+
+          resultBox.classList.add('show');
+        } else {
+          throw new Error('Invalid token or API error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        errorMsg.innerHTML = `❌ Failed to fetch information!<br><small>Error: ${error.message}</small><br><small>Make sure your access token is correct and API is working.</small>`;
+        errorMsg.classList.add('show');
+      } finally {
+        // লোডিং হাইড ও বাটন এনাবল
+        loading.classList.remove('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Get Information';
+      }
+    }
+
+    // এন্টার প্রেসেও সাবমিট হবে
+    document.getElementById('tokenInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        getTokenInfo();
+      }
+    });
+  </script>
 </body>
 </html>
