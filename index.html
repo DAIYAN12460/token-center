@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔥 Eat Token - by তোমার নাম</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🔥 FF ACCESS TOKEN TO JWT 🔥</h1>
+    <p>Enter your Free Fire access token to get account info & JWT</p>
+
+    <form id="tokenForm">
+      <input type="text" id="accessToken" placeholder="Paste Access Token..." required>
+      <button type="submit">Get Info</button>
+    </form>
+
+    <!-- ফলাফল দেখানোর জায়গা -->
+    <div id="result" class="hidden">
+      <h2>✅ Account Details</h2>
+      <div class="info-row"><span>Account Name:</span> <span id="accName">-</span></div>
+      <div class="info-row"><span>Account ID:</span> <span id="accId">-</span></div>
+      <div class="info-row"><span>Open ID:</span> <span id="openId">-</span></div>
+      <div class="info-row"><span>Platform:</span> <span id="platform">-</span></div>
+      <div class="info-row"><span>Region:</span> <span id="region">-</span></div>
+      <div class="info-row"><span>JWT Token:</span> <span id="jwtToken" class="token">-</span></div>
+    </div>
+
+    <div id="error" class="hidden error">❌ Something went wrong. Check your token.</div>
+
+    <footer>
+      <p>CREDIT ➡️ @narutocodexff ✅</p>
+      <p>JOIN ➡️ @narutocodexofc ✅</p>
+      <p>Made by <strong>তোমার নাম</strong></p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
